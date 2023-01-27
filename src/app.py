@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User
+from models import db, User, People, FavPeople, Planet, FavPlanets
 #from models import Person
 
 app = Flask(__name__)
@@ -39,45 +39,52 @@ def sitemap():
 @app.route('/people', methods=['GET'])
 def get_all_people():
 
-    return jsonify({
-        "Mensaje":"Aca estaran los personajes"
-    })
+    all_people = People.query.all()
+    all_people = list(map(lambda people: people.serialize(), all_people))
+
+    return 'Todos los personajes ' + str(all_people)
 
 @app.route('/people/<int:id>', methods=['GET'])
 def get_id_people(id):
 
-    return jsonify({
-        "Mensaje":"Aca esta el personaje por id " + str(id)
-    })
+    id_people = People.query.get(id)
+
+    return "Aca esta el personaje de id " +str(id)+ " y nombre: "+str(id_people.name)
+
 
 @app.route('/planets', methods=['GET'])
 def get_all_planets():
+    
+    all_planet = Planet.query.all()
+    all_planet = list(map(lambda planet: planet.serialize(), all_planet))
 
-    return jsonify({
-        "Mensaje":"Aca estaran los planetas"
-    })
+    return 'Todos los planetas ' + str(all_planet)
 
 @app.route('/planets/<int:id>', methods=['GET'])
 def get_id_planets(id):
 
-    return jsonify({
-        "Mensaje":"Aca esta el planeta por id " + str(id)
-    })
+    id_planet = Planet.query.get(id)
 
+    return "Aca esta el laneta de id " +str(id)+ " y nombre: "+str(id_planet.name)
 
 @app.route('/users', methods=['GET'])
 def handle_hello():
+    
+    all_users = User.query.all()
+    all_users = list(map(lambda user: user.serialize(), all_users))
 
-    return jsonify({
-        "Mensaje":"Aca estaran los users"
-    }), 200
+    return 'Todos los usuarios ' + str(all_users)
 
 @app.route('/users/favorites', methods=['GET'])
 def get_user_favorites():
 
-    return jsonify({
-        "Mensaje":"Aca estaran todos los favoritos del usuario"
-    })
+    all_people_fav = People.query.all()
+    all_people_fav = list(map(lambda people: people.serialize(), all_people_fav))
+
+    all_planet_fav = Planet.query.all()
+    all_planet_fav = list(map(lambda planet: planet.serialize(), all_planet_fav))
+    
+    return 'Planetas favoritos ' + str(all_planet_fav) + 'Personajes favoritos ' + str(all_people_fav)
 
 @app.route('/favorite/planet/<int:id>', methods=['POST'])
 def post_favorite_planet(id):
